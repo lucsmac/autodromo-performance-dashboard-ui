@@ -5,16 +5,16 @@ import { subDays } from "date-fns";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMetrics } from "@/hooks/use-metrics";
 import { useSites } from "@/hooks/use-sites";
-import { PerformanceChart } from "@/components/charts/performance-chart";
-import { WebVitalsChart } from "@/components/charts/web-vitals-chart";
 import { PeriodFilter } from "@/components/filters/period-filter";
 import { MetricSummary } from "@/components/metrics/metric-summary";
 import { DateRange, Period } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { Activity, BarChart3, Clock, Globe } from "lucide-react";
+import { MetricsChart } from "@/components/metrics/metrics-chart";
+import { CoreWebVitalsChart } from "@/components/metrics/core-web-vitals-chart";
 
 export default function HomePage() {
   // Estado para período e filtros
@@ -70,6 +70,11 @@ export default function HomePage() {
   }, [sites]);
 
   const isLoading = sitesLoading || metricsLoading;
+  
+  const initialSiteId = "1";
+  const [selectedSite, setSelectedSite] = React.useState(initialSiteId);
+
+  const selectedSiteName = sites.find(site => site.id === selectedSite)?.name || "";
 
   return (
     <DashboardLayout>
@@ -202,30 +207,66 @@ export default function HomePage() {
                 </CardContent>
               </Card>
 
-              <div className="grid grid-cols-1 gap-6">
-                <PerformanceChart
-                  metrics={filteredMetrics}
-                  title="Tempo de Resposta"
-                  description="Tempo que o servidor leva para responder às requisições (ms)"
-                  period={period}
-                  dataKey="responseTime"
-                />
-
-                <PerformanceChart
-                  metrics={filteredMetrics}
-                  title="Lighthouse Score"
-                  description="Pontuação geral de performance (0-100)"
-                  period={period}
-                  dataKey="lighthouseScore"
-                />
-
-                <WebVitalsChart
-                  metrics={filteredMetrics}
-                  title="Core Web Vitals"
-                  description="Métricas essenciais para experiência do usuário"
-                  period={period}
-                />
-              </div>
+              <Tabs defaultValue="performance" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="performance">Performance Geral</TabsTrigger>
+                  <TabsTrigger value="response-time">Tempo de Resposta</TabsTrigger>
+                  <TabsTrigger value="score">Score Lighthouse</TabsTrigger>
+                  <TabsTrigger value="web-vitals">Core Web Vitals</TabsTrigger>
+                </TabsList>
+                <TabsContent value="performance" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Visão Geral de Performance - {selectedSiteName}</CardTitle>
+                      <CardDescription>
+                        Métricas de performance coletadas durante o período selecionado
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="h-[400px]">
+                      <MetricsChart period={period} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="response-time" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Tempo de Resposta - {selectedSiteName}</CardTitle>
+                      <CardDescription>
+                        Tempo médio de resposta do servidor em milissegundos
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="h-[400px]">
+                      <MetricsChart period={period} metricType="responseTime" />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="score" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Score Lighthouse - {selectedSiteName}</CardTitle>
+                      <CardDescription>
+                        Pontuação geral do Lighthouse (0-100)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="h-[400px]">
+                      <MetricsChart period={period} metricType="score" />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="web-vitals" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Core Web Vitals - {selectedSiteName}</CardTitle>
+                      <CardDescription>
+                        Métricas de Core Web Vitals (CLS, FID, LCP)
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="h-[400px]">
+                      <CoreWebVitalsChart period={period} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </>
           )}
         </div>

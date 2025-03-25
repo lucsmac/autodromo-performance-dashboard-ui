@@ -16,11 +16,6 @@ const navItems = [
     href: "/sites",
     icon: LucideSettings,
   },
-  {
-    title: "Métricas",
-    href: "/metrics",
-    icon: LucideBarChart2,
-  },
 ];
 
 export function Sidebar() {

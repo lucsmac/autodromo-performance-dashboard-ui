@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Site Performance Dashboard",
+  title: "Autoforce Performance Dashboard",
   description: "Dashboard para monitoramento de métricas de performance de sites",
 };
 
