@@ -111,7 +111,7 @@ export function WebVitalsChart({
                         ? `Data: ${format(new Date(item.timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })}`
                         : value;
                     }}
-                    formatter={(value, name, props) => {
+                    formatter={(value, name) => {
                       const metric = metricKeys.find((m) => m.key === name);
                       const evaluation = evaluateMetric(name as string, Number(value));
                       return [
